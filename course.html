@@ -1,0 +1,995 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ללמוד PHP</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --text:#1d2330; --muted:#5d6676;
+    --primary:#2f5bea; --primary-soft:#e6ecff; --ok:#1a8f4c; --ok-soft:#e3f6ea;
+    --bad:#c93a3a; --bad-soft:#fde8e8; --code-bg:#10151f; --code-text:#e6edf7;
+    --border:#dde1e8; --shadow:0 1px 3px rgba(0,0,0,.08);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0f131b; --card:#181e29; --text:#e8ecf3; --muted:#9aa5b8;
+      --primary:#7b9bff; --primary-soft:#1f2a4a; --ok:#4cc38a; --ok-soft:#14301f;
+      --bad:#ff7b7b; --bad-soft:#3a1b1b; --code-bg:#0a0d13; --code-text:#e6edf7;
+      --border:#2a3345; --shadow:none;
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:17px;line-height:1.7}
+  header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:12px}
+  header h1{font-size:18px;margin:0;flex:1}
+  .menu-btn{display:none;background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;font-size:20px;padding:2px 10px;cursor:pointer}
+  .progress-wrap{min-width:110px;text-align:center;font-size:13px;color:var(--muted)}
+  .bar{height:7px;background:var(--border);border-radius:5px;overflow:hidden;margin-top:3px}
+  .bar>div{height:100%;width:0;background:var(--ok);transition:width .3s}
+  .layout{display:grid;grid-template-columns:270px 1fr;max-width:1100px;margin:0 auto}
+  nav{padding:14px;border-left:1px solid var(--border);position:sticky;top:57px;height:calc(100vh - 57px);overflow:auto}
+  nav a{display:flex;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;color:var(--text);text-decoration:none;font-size:15px}
+  nav a:hover{background:var(--primary-soft)}
+  nav a.active{background:var(--primary-soft);font-weight:700;color:var(--primary)}
+  nav .tick{margin-right:auto;color:var(--ok);font-weight:700}
+  nav hr{border:0;border-top:1px solid var(--border);margin:10px 0}
+  main{padding:20px 18px 70px;min-width:0}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin:14px 0;box-shadow:var(--shadow)}
+  h2{margin:4px 0 8px;font-size:26px}
+  h3{margin:0 0 8px;font-size:20px}
+  p{margin:8px 0}
+  ul{padding-right:22px;margin:8px 0}
+  code{background:var(--primary-soft);color:var(--primary);padding:1px 6px;border-radius:5px;font-family:Consolas,Menlo,monospace;font-size:.92em;direction:ltr;unicode-bidi:embed}
+  .codewrap{position:relative;margin:10px 0}
+  pre{margin:0;background:var(--code-bg);color:var(--code-text);padding:14px;border-radius:12px;overflow:auto;direction:ltr;text-align:left;font-family:Consolas,Menlo,monospace;font-size:15px;line-height:1.55}
+  pre code{background:none;color:inherit;padding:0;font-size:inherit}
+  .copy{position:absolute;top:6px;left:6px;background:#2b3448;color:#fff;border:0;border-radius:7px;padding:3px 10px;font-size:12px;cursor:pointer;opacity:.85}
+  textarea{width:100%;min-height:170px;background:var(--code-bg);color:var(--code-text);border:1px solid var(--border);border-radius:12px;padding:12px;font-family:Consolas,Menlo,monospace;font-size:15px;line-height:1.55;direction:ltr;text-align:left;resize:vertical}
+  button.btn{background:var(--primary);color:#fff;border:0;border-radius:10px;padding:9px 18px;font-size:15px;cursor:pointer;margin:6px 0 0 6px}
+  button.btn.secondary{background:var(--primary-soft);color:var(--primary)}
+  button.btn:disabled{opacity:.5;cursor:default}
+  .qt{font-weight:700;margin:0 0 8px}
+  .opts{display:grid;gap:8px}
+  .opt{text-align:right;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 12px;font-size:16px;cursor:pointer;font-family:inherit}
+  .opt.ok{background:var(--ok-soft);border-color:var(--ok)}
+  .opt.bad{background:var(--bad-soft);border-color:var(--bad)}
+  .opt.sel{background:var(--primary-soft);border-color:var(--primary)}
+  .opt[dir=ltr]{text-align:left;font-family:Consolas,Menlo,monospace}
+  .fb{margin-top:8px;font-size:15px;min-height:1px}
+  .fb.ok{color:var(--ok)} .fb.bad{color:var(--bad)}
+  .result{border-radius:10px;padding:10px 12px;margin-top:10px;font-size:15px}
+  .result.ok{background:var(--ok-soft);color:var(--ok)}
+  .result.bad{background:var(--bad-soft);color:var(--bad)}
+  .result ul{margin:4px 0}
+  .hint{background:var(--primary-soft);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:15px}
+  .tag{display:inline-block;font-size:12px;background:var(--primary-soft);color:var(--primary);border-radius:20px;padding:1px 10px;margin-left:6px}
+  .nav-buttons{display:flex;justify-content:space-between;gap:10px;margin-top:20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+  .lcard{display:block;text-decoration:none;color:var(--text);background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;box-shadow:var(--shadow)}
+  .lcard:hover{border-color:var(--primary)}
+  .lcard .ic{font-size:26px}
+  .lcard .st{font-size:13px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  th,td{padding:8px 6px;border-bottom:1px solid var(--border);text-align:right;vertical-align:top}
+  td.c{direction:ltr;text-align:left;font-family:Consolas,Menlo,monospace;white-space:pre-wrap}
+  .tip{border-right:4px solid var(--primary);background:var(--primary-soft);padding:8px 12px;border-radius:8px;margin:10px 0}
+  .warn{border-right:4px solid var(--bad);background:var(--bad-soft);padding:8px 12px;border-radius:8px;margin:10px 0}
+  @media (max-width:820px){
+    .layout{grid-template-columns:1fr}
+    .menu-btn{display:block}
+    nav{position:fixed;right:0;top:57px;width:270px;max-width:85vw;background:var(--card);z-index:30;transform:translateX(105%);transition:transform .2s;border-left:1px solid var(--border);box-shadow:-4px 0 12px rgba(0,0,0,.2)}
+    nav.open{transform:none}
+    .scrim{display:none;position:fixed;inset:57px 0 0 0;background:rgba(0,0,0,.35);z-index:25}
+    .scrim.show{display:block}
+    h2{font-size:22px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="menu-btn" id="menuBtn" aria-label="תפריט">☰</button>
+  <h1>🐘 ללמוד PHP</h1>
+  <div class="progress-wrap"><span id="progText">0%</span><div class="bar"><div id="progBar"></div></div></div>
+</header>
+<div class="scrim" id="scrim"></div>
+
+<div class="layout">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+/* =========================================================================
+   איך מוסיפים שיעור חדש?
+   ---------------------------------------------------------------------------
+   כל השיעורים נמצאים במערך LESSONS למטה. כדי להוסיף שיעור - מעתיקים אחד
+   הקיימים ומשנים. כל שיעור מורכב מ:
+     id     - שם קצר באנגלית (חייב להיות ייחודי)
+     icon   - אימוג'י
+     title  - הכותרת
+     html   - ההסבר (HTML). שימו לב: את התו < כותבים &lt; בתוך הסבר
+     code   - קוד לדוגמה (טקסט גולמי, בתוך String.raw`...`)
+     quiz   - רשימת שאלות: {q, o:[תשובות], a:מספר התשובה הנכונה (מתחיל ב-0), e:הסבר}
+     ex     - תרגיל: {task, starter, checks:[[ביטוי, הודעה]], hint, solution}
+              checks = בדיקות. כל בדיקה היא זוג: ביטוי רגולרי שחייב להופיע בקוד,
+              והודעה שתוצג אם הוא לא נמצא.
+   הערה חשובה: הדפדפן לא יכול להריץ PHP, לכן התרגילים נבדקים לפי מבנה הקוד
+   ולא לפי הפלט האמיתי.
+   ========================================================================= */
+
+const LESSONS = [
+
+/* ------------------------------ 1 ------------------------------ */
+{
+  id:'intro', icon:'🚀', title:'מה זה PHP ואיך מתחילים',
+  html:`
+    <p>PHP היא שפה שרצה <b>בשרת</b> - לא בדפדפן ולא בטלפון. השרת מריץ את הקובץ, ומחזיר למי שקרא לו רק את <b>מה שהודפס</b>.</p>
+    <p>למשל במערכת הטלפונית: המערכת קוראת לקובץ ה-PHP בכתובת, והקובץ מדפיס טקסט כמו <code>id_list_message=m-2573.g-hangup</code>. המערכת קוראת את הטקסט ומבצעת אותו.</p>
+    <h3>חמשת הכללים הראשונים</h3>
+    <ul>
+      <li>הקובץ נשמר עם סיומת <code>.php</code></li>
+      <li>הקוד מתחיל בשורה <code>&lt;?php</code></li>
+      <li>כל פקודה <b>נגמרת בנקודה-פסיק</b> <code>;</code></li>
+      <li><code>echo</code> ו-<code>print</code> מדפיסים טקסט החוצה</li>
+      <li>הערות (שהמחשב מתעלם מהן): <code>// הערה בשורה</code> או <code>/* הערה ארוכה */</code></li>
+    </ul>
+    <div class="tip">אין שום רווח או תו לפני <code>&lt;?php</code>. גם רווח אחד ירוץ החוצה ויקלקל את התשובה למערכת.</div>`,
+  code:String.raw`<?php
+// זו הערה - המחשב מתעלם ממנה
+echo "שלום עולם";   // מדפיס טקסט
+print "id_list_message=m-2573.g-hangup";   // גם print מדפיס`,
+  quiz:[
+    {q:'באיזו שורה מתחיל קובץ PHP?', o:['<?php','<php>','<?=php?','#!php'], a:0, e:'כל קוד PHP מתחיל ב-<?php'},
+    {q:'מה מסיים פקודה ב-PHP?', o:['נקודה (.)','נקודה-פסיק (;)','פסיק (,)','כלום, שורה חדשה מספיקה'], a:1, e:'כל פקודה נגמרת ב-; - שכחת נקודה-פסיק היא הטעות הנפוצה ביותר.'},
+    {q:'איפה רץ קוד PHP?', o:['בדפדפן של המשתמש','בשרת','בטלפון של המשתמש','בכרטיס המסך'], a:1, e:'PHP רץ בשרת. למשתמש (או למערכת הטלפונית) מגיע רק הטקסט שהודפס.'}
+  ],
+  ex:{
+    task:'כתוב קוד שמדפיס את המילה: שלום (בעזרת echo).',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/<\?php/, 'הקוד חייב להתחיל ב-<?php'],
+      [/echo\s+["']\s*שלום\s*["']\s*;/, 'השתמש ב-echo עם המילה שלום בין מרכאות, ובסוף נקודה-פסיק']
+    ],
+    hint:'המבנה: echo "טקסט";',
+    solution:String.raw`<?php
+echo "שלום";`
+  }
+},
+
+/* ------------------------------ 2 ------------------------------ */
+{
+  id:'vars', icon:'📦', title:'משתנים',
+  html:`
+    <p>משתנה הוא "קופסה עם שם" ששומרת ערך. שם משתנה מתחיל תמיד ב-<code>$</code>.</p>
+    <h3>כללים לשם משתנה</h3>
+    <ul>
+      <li>מתחיל ב-<code>$</code> ואחריו אות או קו תחתון</li>
+      <li>אסור רווחים, ואסור להתחיל במספר</li>
+      <li><b>אותיות קטנות וגדולות הן שונות</b>: <code>$phone</code> ו-<code>$Phone</code> הם שני משתנים שונים</li>
+    </ul>
+    <p>בקוד של התא הקולי יש שורות כאלה: הטלפון והטוקן נשמרים במשתנים כדי להשתמש בהם בהמשך.</p>`,
+  code:String.raw`<?php
+$name = "דוד";        // טקסט - בין מרכאות
+$age = 30;            // מספר - בלי מרכאות
+$phone = "0501234567";
+echo $name;           // מדפיס: דוד
+$age = 31;            // אפשר לשנות ערך בהמשך`,
+  quiz:[
+    {q:'איזה שם משתנה תקין?', o:['$my_phone','my_phone','$1phone','$my phone'], a:0, e:'חייב להתחיל ב-$, לא במספר, ובלי רווחים.'},
+    {q:'האם $phone ו-$Phone הם אותו משתנה?', o:['כן','לא, PHP מבדיל בין אותיות קטנות לגדולות'], a:1, e:'שמות משתנים רגישים לאותיות קטנות/גדולות.'}
+  ],
+  ex:{
+    task:'צור משתנה בשם $city עם הערך ירושלים, והדפס אותו.',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/\$city\s*=\s*["']\s*ירושלים\s*["']\s*;/, 'הגדר: $city = "ירושלים";'],
+      [/echo\s+\$city\s*;/, 'הדפס את המשתנה: echo $city;']
+    ],
+    hint:'$city = "ירושלים"; ואחר כך echo $city;',
+    solution:String.raw`<?php
+$city = "ירושלים";
+echo $city;`
+  }
+},
+
+/* ------------------------------ 3 ------------------------------ */
+{
+  id:'strings', icon:'🔤', title:'טקסט וחיבור טקסטים',
+  html:`
+    <p>טקסט נקרא "מחרוזת". אפשר לכתוב אותו במרכאות כפולות <code>"..."</code> או בודדות <code>'...'</code>, ויש הבדל חשוב:</p>
+    <ul>
+      <li><b>מרכאות כפולות</b> - משתנה בתוכן מוחלף בערך שלו: <code>"שלום $name"</code></li>
+      <li><b>מרכאות בודדות</b> - הכל נשאר כמו שכתוב, אפילו ה-$</li>
+    </ul>
+    <p>כדי לחבר טקסטים משתמשים ב<b>נקודה</b> <code>.</code></p>
+    <p>זה בדיוק מה שקורה בקוד שלך: <code>"$link?token=$token&amp;path=..."</code> - המשתנים נכנסים לתוך הכתובת.</p>`,
+  code:String.raw`<?php
+$name = "דוד";
+echo "שלום $name";          // שלום דוד
+echo 'שלום $name';          // שלום $name  (בדיוק כך!)
+echo "שלום " . $name;       // חיבור עם נקודה
+$link = "https://example.com/api";
+$token = "abc123";
+$url = "$link?token=$token";   // https://example.com/api?token=abc123`,
+  quiz:[
+    {q:"מה ידפיס:  echo 'שלום $name';  ?", o:['שלום דוד','שלום $name','שגיאה','שלום'], a:1, e:'במרכאות בודדות המשתנה לא מוחלף - מודפס בדיוק מה שכתוב.'},
+    {q:'איזה סימן מחבר שני טקסטים?', o:['+','&','. (נקודה)',','], a:2, e:'ב-PHP חיבור טקסטים נעשה בנקודה. (הפלוס מיועד למספרים בלבד.)'}
+  ],
+  ex:{
+    task:'הגדר $first = "דוד" ו-$last = "כהן", והדפס את השם המלא עם רווח ביניהם (אפשר עם נקודה או בתוך מרכאות כפולות).',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/\$first\s*=\s*["']\s*דוד\s*["']\s*;/, 'הגדר $first = "דוד";'],
+      [/\$last\s*=\s*["']\s*כהן\s*["']\s*;/, 'הגדר $last = "כהן";'],
+      [/echo[^;]*\$first[^;]*\$last[^;]*;/, 'בפקודת echo אחת: קודם $first ואחריו $last']
+    ],
+    hint:'echo $first . " " . $last;   או:   echo "$first $last";',
+    solution:String.raw`<?php
+$first = "דוד";
+$last = "כהן";
+echo $first . " " . $last;`
+  }
+},
+
+/* ------------------------------ 4 ------------------------------ */
+{
+  id:'numbers', icon:'🔢', title:'מספרים וחישובים',
+  html:`
+    <p>במספרים אין מרכאות. הפעולות הבסיסיות:</p>
+    <table>
+      <tr><th>סימן</th><th>פעולה</th><th>דוגמה</th></tr>
+      <tr><td class="c">+</td><td>חיבור</td><td class="c">5 + 2 = 7</td></tr>
+      <tr><td class="c">-</td><td>חיסור</td><td class="c">5 - 2 = 3</td></tr>
+      <tr><td class="c">*</td><td>כפל</td><td class="c">5 * 2 = 10</td></tr>
+      <tr><td class="c">/</td><td>חילוק</td><td class="c">7 / 2 = 3.5</td></tr>
+      <tr><td class="c">%</td><td>שארית החילוק</td><td class="c">7 % 2 = 1</td></tr>
+      <tr><td class="c">++</td><td>מוסיף 1</td><td class="c">$i++</td></tr>
+    </table>
+    <p>ה-<code>++</code> מופיע בלולאה בקוד שלך: <code>for ($i = 0; $i &lt;= 9; $i++)</code> - נלמד בשיעור על לולאות.</p>`,
+  code:String.raw`<?php
+$price = 50;
+$qty = 3;
+$total = $price * $qty;   // 150
+echo $total;
+echo 10 % 3;              // 1
+$count = 5;
+$count++;                 // עכשיו 6`,
+  quiz:[
+    {q:'מה התוצאה של 10 % 3 ?', o:['3','1','3.33','0'], a:1, e:'% נותן את שארית החילוק: 10 לחלק ל-3 זה 3 ושארית 1.'},
+    {q:'מה התוצאה של 7 / 2 ?', o:['3','4','3.5','1'], a:2, e:'חילוק ב-PHP נותן גם שברים: 3.5'}
+  ],
+  ex:{
+    task:'הגדר $price = 50 ו-$qty = 3, חשב $total (מחיר כפול כמות) והדפס אותו.',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/\$price\s*=\s*50\s*;/, 'הגדר $price = 50;'],
+      [/\$qty\s*=\s*3\s*;/, 'הגדר $qty = 3;'],
+      [/\$total\s*=\s*\$price\s*\*\s*\$qty\s*;/, 'חשב: $total = $price * $qty;'],
+      [/echo\s+\$total\s*;/, 'הדפס: echo $total;']
+    ],
+    hint:'כפל זה הסימן *',
+    solution:String.raw`<?php
+$price = 50;
+$qty = 3;
+$total = $price * $qty;
+echo $total;`
+  }
+},
+
+/* ------------------------------ 5 ------------------------------ */
+{
+  id:'if', icon:'🔀', title:'תנאים (if / else)',
+  html:`
+    <p>תנאי נותן לקוד "להחליט". אם התנאי נכון - רצה קבוצת פקודות אחת, אחרת - קבוצה אחרת.</p>
+    <p>זה מה שקורה בסוף הקוד שלך: <code>if($ok){ ... }else{ ... }</code> - אם הכל הצליח מדפיסים הודעת הצלחה, אחרת הודעת שגיאה.</p>
+    <h3>סימני השוואה</h3>
+    <table>
+      <tr><th>סימן</th><th>משמעות</th></tr>
+      <tr><td class="c">==</td><td>שווה (לא מסתכל על סוג)</td></tr>
+      <tr><td class="c">===</td><td>שווה לגמרי (גם הסוג)</td></tr>
+      <tr><td class="c">!=</td><td>שונה</td></tr>
+      <tr><td class="c">&gt; &lt; &gt;= &lt;=</td><td>גדול, קטן, גדול-או-שווה, קטן-או-שווה</td></tr>
+      <tr><td class="c">&amp;&amp;</td><td>וגם</td></tr>
+      <tr><td class="c">||</td><td>או</td></tr>
+      <tr><td class="c">!</td><td>לא (הפוך)</td></tr>
+    </table>
+    <div class="warn">שים לב: <code>=</code> אחד זה <b>השמה</b> (לשים ערך במשתנה), ו-<code>==</code> זו <b>השוואה</b>. בלבול ביניהם הוא באג קלאסי.</div>`,
+  code:String.raw`<?php
+$status = "OK";
+if ($status == "OK") {
+    print "הצלחה";
+} elseif ($status == "WAIT") {
+    print "ממתין";
+} else {
+    print "כישלון";
+}
+
+// שילוב תנאים
+if ($phone === '' || $token === '') {
+    print "חסרים נתונים";
+}`,
+  quiz:[
+    {q:'מה ידפיס?   $x = 5;  if ($x > 10) { echo "גדול"; } else { echo "קטן"; }', o:['גדול','קטן','שניהם','כלום'], a:1, e:'5 לא גדול מ-10, לכן נכנסים ל-else.'},
+    {q:'מה ההבדל בין == ל-===?', o:['אין הבדל','=== בודק גם את סוג הערך','== בודק גם את הסוג','=== מקצר את הקוד'], a:1, e:'=== דורש שגם הסוג יהיה זהה (למשל "5" טקסט לעומת 5 מספר).'}
+  ],
+  ex:{
+    task:'הגדר $count = 5. אם $count גדול מ-3 הדפס: הרבה. אחרת הדפס: מעט.',
+    starter:String.raw`<?php
+$count = 5;
+// כתוב כאן
+`,
+    checks:[
+      [/if\s*\(\s*\$count\s*>\s*3\s*\)/, 'כתוב תנאי: if ($count > 3)'],
+      [/echo\s+["']\s*הרבה\s*["']/, 'בתוך ה-if הדפס "הרבה"'],
+      [/else/, 'הוסף else'],
+      [/echo\s+["']\s*מעט\s*["']/, 'בתוך ה-else הדפס "מעט"']
+    ],
+    hint:'if (תנאי) { ... } else { ... }',
+    solution:String.raw`<?php
+$count = 5;
+if ($count > 3) {
+    echo "הרבה";
+} else {
+    echo "מעט";
+}`
+  }
+},
+
+/* ------------------------------ 6 ------------------------------ */
+{
+  id:'arrays', icon:'🗂️', title:'מערכים',
+  html:`
+    <p>מערך הוא <b>רשימה</b> של ערכים בתוך משתנה אחד. כותבים אותו בסוגריים מרובעים <code>[ ]</code>.</p>
+    <h3>שני סוגי מערכים</h3>
+    <ul>
+      <li><b>רשימה פשוטה</b> - לכל פריט יש מספר (מתחיל מ-<b>0</b>): <code>$a[0]</code> הוא הפריט הראשון</li>
+      <li><b>מערך עם שמות</b> - לכל פריט יש "תווית": <code>'type' =&gt; 'record'</code>. קוראים אותו עם <code>$a['type']</code></li>
+    </ul>
+    <p>בקוד שלך כל שלוחה היא מערך עם שמות: <code>'type' =&gt; 'menu'</code> אומר "ההגדרה type שווה menu". וכל רשימת השלוחות <code>$steps</code> היא רשימה פשוטה של שלוחות.</p>
+    <h3>פעולות שימושיות</h3>
+    <ul>
+      <li><code>$a[] = "x";</code> - מוסיף לסוף הרשימה</li>
+      <li><code>count($a)</code> - כמה פריטים יש</li>
+    </ul>`,
+  code:String.raw`<?php
+// רשימה פשוטה
+$fruits = ["תפוח", "בננה", "תמר"];
+echo $fruits[0];          // תפוח  (הראשון הוא 0!)
+$fruits[] = "ענבים";      // מוסיף לסוף
+echo count($fruits);      // 4
+
+// מערך עם שמות
+$ext = [
+    'type'      => 'record',
+    'record_ok' => '#',
+];
+echo $ext['type'];        // record`,
+  quiz:[
+    {q:'באיזה מספר מתחיל המיקום של הפריט הראשון במערך?', o:['0','1','-1','10'], a:0, e:'בתכנות סופרים מ-0. $a[0] הוא הראשון.'},
+    {q:'איך מוסיפים פריט לסוף מערך $arr?', o:['$arr[] = "x";','add($arr, "x");','$arr.add("x");','$arr + "x";'], a:0, e:'הסימן [] בלי מספר מוסיף לסוף.'},
+    {q:"מה זה  ['type' => 'menu']  ?", o:['רשימה פשוטה','מערך עם שמות (מפתח וערך)','פונקציה','תנאי'], a:1, e:'כל פריט הוא זוג: מפתח (type) => ערך (menu).'}
+  ],
+  ex:{
+    task:'צור מערך $fruits עם שלושה פירות והדפס כמה פריטים יש בו (בעזרת count).',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/\$fruits\s*=\s*\[[^\]]+,[^\]]+,[^\]]+\]\s*;/, 'צור: $fruits = ["...", "...", "..."];'],
+      [/echo\s+count\s*\(\s*\$fruits\s*\)\s*;/, 'הדפס: echo count($fruits);']
+    ],
+    hint:'$fruits = ["תפוח", "בננה", "תמר"];',
+    solution:String.raw`<?php
+$fruits = ["תפוח", "בננה", "תמר"];
+echo count($fruits);`
+  }
+},
+
+/* ------------------------------ 7 ------------------------------ */
+{
+  id:'loops', icon:'🔁', title:'לולאות (for / foreach)',
+  html:`
+    <p>לולאה מריצה אותו קטע קוד שוב ושוב, בלי לכתוב אותו מחדש.</p>
+    <h3>לולאת for - כשיודעים כמה פעמים</h3>
+    <p><code>for ($i = 0; $i &lt;= 9; $i++)</code> זה שלושה חלקים:</p>
+    <ul>
+      <li><code>$i = 0</code> - נקודת ההתחלה</li>
+      <li><code>$i &lt;= 9</code> - ממשיכים כל עוד זה נכון</li>
+      <li><code>$i++</code> - אחרי כל סיבוב מוסיפים 1</li>
+    </ul>
+    <h3>לולאת foreach - לעבור על כל פריט במערך</h3>
+    <p><code>foreach ($steps as $s)</code> - "עבור כל פריט ב-$steps, קרא לו $s".</p>
+    <p>ואם צריך גם את המפתח: <code>foreach ($a as $key =&gt; $value)</code></p>
+    <p><code>break</code> עוצר את הלולאה מיד (כמו שעשינו כשהייתה שגיאה).</p>`,
+  code:String.raw`<?php
+// for - מדפיס 0 עד 9
+for ($i = 0; $i <= 9; $i++) {
+    echo $i;
+}
+
+// foreach - עובר על כל פריט
+$names = ["דוד", "משה", "יוסף"];
+foreach ($names as $n) {
+    echo $n;
+}
+
+// foreach עם מפתח וערך
+$tts = ['5' => 'אנשי קשר', '6' => 'רשימה שחורה'];
+foreach ($tts as $key => $text) {
+    echo "$key = $text";
+}`,
+  quiz:[
+    {q:'מה עושה  foreach ($steps as $s) ?', o:['מריצה את הקוד פעם אחת','עוברת על כל פריט ב-$steps, ובכל סיבוב $s הוא הפריט הנוכחי','מוחקת את $steps','מוסיפה פריט ל-$steps'], a:1, e:'foreach "מפרקת" את המערך ועוברת פריט פריט.'},
+    {q:'מה עושה break בתוך לולאה?', o:['מדלגת לסיבוב הבא','עוצרת את הלולאה לגמרי','מתחילה מחדש','כלום'], a:1, e:'break עוצר את הלולאה מיד.'}
+  ],
+  ex:{
+    task:'כתוב לולאת for שמדפיסה את המספרים 1 עד 5.',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/for\s*\(\s*\$i\s*=\s*1\s*;\s*\$i\s*<=\s*5\s*;\s*\$i\+\+\s*\)/, 'כתוב: for ($i = 1; $i <= 5; $i++)'],
+      [/echo[^;]*\$i[^;]*;/, 'בתוך הלולאה הדפס את $i']
+    ],
+    hint:'for ($i = 1; $i <= 5; $i++) { echo $i; }',
+    solution:String.raw`<?php
+for ($i = 1; $i <= 5; $i++) {
+    echo $i;
+}`
+  }
+},
+
+/* ------------------------------ 8 ------------------------------ */
+{
+  id:'functions', icon:'⚙️', title:'פונקציות',
+  html:`
+    <p>פונקציה היא קטע קוד עם שם, שאפשר להפעיל כמה פעמים. במקום לכתוב אותו שוב ושוב - כותבים פעם אחת וקוראים בשמו.</p>
+    <ul>
+      <li><b>הגדרה</b> (פעם אחת): <code>function שם($נתון) { ... }</code></li>
+      <li><b>הפעלה</b> (כמה פעמים): <code>שם(5);</code></li>
+      <li><code>return</code> מחזיר תוצאה למי שהפעיל את הפונקציה</li>
+    </ul>
+    <p>בקוד שלך יש פונקציה <code>ym</code> ששולחת פקודה לשרת ומחזירה הצליח/נכשל, ופונקציה <code>ext</code> שמוסיפה לה לבד את הטוקן והנתיב.</p>
+    <div class="tip">הנתונים שהפונקציה מקבלת נקראים <b>פרמטרים</b> (הסוגריים בהגדרה). הם קיימים רק בתוך הפונקציה.</div>`,
+  code:String.raw`<?php
+function add($a, $b) {
+    return $a + $b;
+}
+
+echo add(2, 3);        // 5
+echo add(10, 20);      // 30
+
+// פונקציה שמחזירה אמת/שקר
+function isOk($status): bool {
+    return $status === 'OK';
+}
+if (isOk('OK')) { echo "הצלחה"; }`,
+  quiz:[
+    {q:'מה עושה return?', o:['מדפיס טקסט','מחזיר ערך למי שהפעיל את הפונקציה','מוחק משתנה','מתחיל לולאה'], a:1, e:'return שולח תוצאה חזרה לנקודה שבה הפונקציה הופעלה.'},
+    {q:'כמה פעמים כותבים את ההגדרה (function ...) של פונקציה?', o:['בכל פעם שמשתמשים בה','פעם אחת'], a:1, e:'מגדירים פעם אחת, ומפעילים כמה שרוצים.'}
+  ],
+  ex:{
+    task:'כתוב פונקציה בשם twice שמקבלת מספר $n ומחזירה אותו כפול 2. הדפס את twice(4).',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/function\s+twice\s*\(\s*\$n\s*\)/, 'הגדר: function twice($n)'],
+      [/return\s+\$n\s*\*\s*2\s*;/, 'בתוך הפונקציה: return $n * 2;'],
+      [/echo\s+twice\s*\(\s*4\s*\)\s*;/, 'הדפס: echo twice(4);']
+    ],
+    hint:'function twice($n) { return $n * 2; }',
+    solution:String.raw`<?php
+function twice($n) {
+    return $n * 2;
+}
+echo twice(4);`
+  }
+},
+
+/* ------------------------------ 9 ------------------------------ */
+{
+  id:'get', icon:'📥', title:'קבלת נתונים מהכתובת ($_GET)',
+  html:`
+    <p>כשהמערכת קוראת לקובץ היא מוסיפה לכתובת נתונים אחרי סימן שאלה:</p>
+    <p><code>https://site.com/file.php?ApiPhone=0501234567&amp;goto=/1&amp;token=abc</code></p>
+    <p>ב-PHP כל נתון כזה נמצא ב-<code>$_GET</code> - מערך מיוחד שנוצר אוטומטית. את הערך קוראים לפי השם: <code>$_GET['ApiPhone']</code>.</p>
+    <h3>הגנות חשובות</h3>
+    <ul>
+      <li><code>?? ''</code> - "אם הנתון לא הגיע, תשתמש בערך ריק" (במקום שגיאה)</li>
+      <li><code>preg_replace('/\\D/', '', ...)</code> - מוחק כל תו שהוא לא ספרה</li>
+    </ul>
+    <div class="warn">לעולם אל תסמוך על נתונים שמגיעים מהכתובת - כל אחד יכול לשלוח מה שהוא רוצה. לכן מנקים אותם.</div>`,
+  code:String.raw`<?php
+// כך נראה קוד הפתיחה שלך
+$phone = preg_replace('/\D/', '', $_GET['ApiPhone'] ?? '');
+$goto  = $_GET['goto'] ?? '';
+$token = $_GET['token'] ?? '';
+
+// אם חסר משהו - עוצרים
+if ($phone === '' || $token === '') {
+    print "id_list_message=m-1804.g-hangup";
+    exit();
+}`,
+  quiz:[
+    {q:"איך קוראים את הנתון token מהכתובת?", o:["$_GET['token']","$token['get']","GET(token)","$_URL['token']"], a:0, e:"כל נתונים מהכתובת נמצאים ב-$_GET, לפי שם."},
+    {q:"מה עושה  $_GET['x'] ?? ''  ?", o:["מוחק את x","נותן את x, ואם לא הגיע - טקסט ריק","תמיד נותן טקסט ריק","גורם לשגיאה"], a:1, e:"?? נותן ערך חלופי כשהנתון חסר."},
+    {q:"מה עושה exit(); ?", o:["מדפיס יציאה","עוצר את הקובץ מיד","מנקה משתנים","מתחיל מחדש"], a:1, e:"exit עוצר את ריצת הקובץ."}
+  ],
+  ex:{
+    task:"הגדר $name שמקבל את הנתון name מהכתובת, ואם לא הגיע - אורח. הדפס: שלום ואחריו השם.",
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/\$name\s*=\s*\$_GET\s*\[\s*['"]name['"]\s*\]\s*\?\?\s*['"]\s*אורח\s*['"]\s*;/, "כתוב: $name = $_GET['name'] ?? 'אורח';"],
+      [/echo[^;]*\$name[^;]*;/, 'הדפס את $name בעזרת echo']
+    ],
+    hint:"$name = $_GET['name'] ?? 'אורח';  ואחר כך echo \"שלום $name\";",
+    solution:String.raw`<?php
+$name = $_GET['name'] ?? 'אורח';
+echo "שלום $name";`
+  }
+},
+
+/* ------------------------------ 10 ------------------------------ */
+{
+  id:'api', icon:'🌐', title:'קריאה לשרת אחר (file_get_contents ו-JSON)',
+  html:`
+    <p>קובץ ה-PHP שלך שולח הרבה פקודות לשרת של ימות המשיח. זה נעשה עם <code>file_get_contents</code> - פונקציה שפותחת כתובת ומחזירה את התשובה כטקסט.</p>
+    <p>השרת עונה בפורמט <b>JSON</b>, למשל: <code>{"responseStatus":"OK"}</code>. כדי לקרוא אותו הופכים אותו למערך עם <code>json_decode($raw, true)</code>.</p>
+    <h3>שלבים</h3>
+    <ul>
+      <li>1. שולחים: <code>$raw = file_get_contents($url);</code></li>
+      <li>2. אם נכשל החיבור, מקבלים <code>false</code></li>
+      <li>3. הופכים למערך: <code>$res = json_decode($raw, true);</code></li>
+      <li>4. קוראים את הסטטוס: <code>$res['responseStatus']</code></li>
+    </ul>
+    <div class="tip"><code>http_build_query</code> בונה לבד את החלק שאחרי סימן השאלה מתוך מערך, כולל קידוד של תווים מיוחדים (למשל # הופך ל-%23).</div>`,
+  code:String.raw`<?php
+$params = ['token' => $token, 'path' => 'ivr2:/3/' . $phone];
+$url = "https://call2all.co.il/ym/api/UpdateExtension?" . http_build_query($params);
+
+$raw = @file_get_contents($url);       // @ מסתיר הודעת שגיאה אם נכשל
+if ($raw === false) {
+    echo "החיבור נכשל";
+} else {
+    $res = json_decode($raw, true);    // true = להפוך למערך
+    if (isset($res['responseStatus']) && $res['responseStatus'] === 'OK') {
+        echo "הצליח";
+    }
+}`,
+  quiz:[
+    {q:"מה מחזירה file_get_contents אם החיבור נכשל?", o:["טקסט ריק","0","false","null"], a:2, e:"היא מחזירה false - לכן בודקים אותה עם ===."},
+    {q:"מה עושה json_decode($raw, true)?", o:["הופכת טקסט JSON למערך","שולחת בקשה לשרת","מוחקת את $raw","מצפינה את הטקסט"], a:0, e:"ה-true אומר להחזיר מערך (ולא אובייקט)."}
+  ],
+  ex:{
+    task:"נתון $raw עם תשובת שרת. הפוך אותו למערך והדפס את responseStatus.",
+    starter:String.raw`<?php
+$raw = '{"responseStatus":"OK"}';
+// כתוב כאן
+`,
+    checks:[
+      [/json_decode\s*\(\s*\$raw\s*,\s*true\s*\)/, 'השתמש ב-json_decode($raw, true)'],
+      [/\[\s*['"]responseStatus['"]\s*\]/, "קרא את ['responseStatus'] מהמערך"],
+      [/echo/, 'הדפס את התוצאה עם echo']
+    ],
+    hint:"$res = json_decode($raw, true);  echo $res['responseStatus'];",
+    solution:String.raw`<?php
+$raw = '{"responseStatus":"OK"}';
+$res = json_decode($raw, true);
+echo $res['responseStatus'];`
+  }
+},
+
+/* ------------------------------ 11 ------------------------------ */
+{
+  id:'debug', icon:'🐞', title:'שגיאות ואיך מתקנים אותן',
+  html:`
+    <p>כולם טועים - גם מתכנתים מנוסים. הכישרון הוא לדעת למצוא את הטעות.</p>
+    <h3>הטעויות הנפוצות ביותר</h3>
+    <ul>
+      <li>חסרה נקודה-פסיק <code>;</code> בסוף שורה</li>
+      <li>חסר <code>$</code> לפני שם משתנה</li>
+      <li>מרכאות או סוגריים שנפתחו ולא נסגרו</li>
+      <li>רווח או תו לפני <code>&lt;?php</code></li>
+      <li>שימוש ב-<code>=</code> במקום <code>==</code> בתנאי</li>
+    </ul>
+    <h3>כלים</h3>
+    <ul>
+      <li><code>print_r($arr);</code> - מדפיס את תוכן המערך</li>
+      <li><code>var_dump($x);</code> - מדפיס ערך וסוג</li>
+      <li><code>error_reporting(E_ALL); ini_set('display_errors','1');</code> - מציג את כל השגיאות (בזמן פיתוח)</li>
+      <li>בשורת הפקודה: <code>php -l file.php</code> בודק תחביר בלי להריץ</li>
+    </ul>
+    <div class="tip">בהודעת שגיאה, תסתכל על <b>מספר השורה</b>. הטעות היא בדרך כלל בשורה הזו או בשורה שלפניה.</div>
+    <div class="warn">בקובץ שמחזיר תשובה למערכת טלפונית - אחרי שסיימת לבדוק, כבה הצגת שגיאות (<code>error_reporting(0)</code>), כי הודעת שגיאה תודפס ותקלקל את התשובה.</div>`,
+  code:String.raw`<?php
+error_reporting(E_ALL);          // לבדיקות: להציג הכל
+ini_set('display_errors', '1');
+
+$a = ['x' => 1, 'y' => 2];
+print_r($a);                     // מראה את כל המערך
+var_dump(5 == "5");              // bool(true)
+var_dump(5 === "5");             // bool(false)`,
+  quiz:[
+    {q:'איזו פקודה מדפיסה את כל תוכן המערך?', o:['echo $arr;','print_r($arr);','list($arr);','show($arr);'], a:1, e:'print_r (או var_dump) מראים את תוכן המערך. echo על מערך לא עובד.'},
+    {q:'מה הסיבה הנפוצה ל-Parse error?', o:['האינטרנט איטי','חסרה נקודה-פסיק או סוגר','השרת כבוי','הקובץ גדול מדי'], a:1, e:'שגיאות תחביר נובעות לרוב מ-; או סוגריים/מרכאות חסרים.'}
+  ],
+  ex:{
+    task:'בקוד יש שתי טעויות. תקן אותו כך שיפעל: הגדרת $name והדפסת "שלום " ואחריו השם.',
+    starter:String.raw`<?php
+$name = "דוד"
+echo "שלום " . name;`,
+    checks:[
+      [/\$name\s*=\s*["']\s*דוד\s*["']\s*;/, 'חסרה נקודה-פסיק בסוף שורת ההגדרה'],
+      [/echo\s+["']\s*שלום\s*["']\s*\.\s*\$name\s*;/, 'לפני השם name חסר הסימן $']
+    ],
+    hint:'שתי הטעויות: ; חסרה אחרי "דוד", ו-$ חסר לפני name.',
+    solution:String.raw`<?php
+$name = "דוד";
+echo "שלום " . $name;`
+  }
+},
+
+/* ------------------------------ 12 ------------------------------ */
+{
+  id:'project', icon:'🏁', title:'פרויקט מסכם: רשימת שלוחות',
+  html:`
+    <p>עכשיו נחבר הכל לרעיון של הקוד שלך: <b>רשימה</b> של שלוחות, ו<b>לולאה</b> ששולחת כל אחת מהן.</p>
+    <p>היתרון: כדי להוסיף שלוחה חדשה לא כותבים קוד חדש - מוסיפים שורה אחת לרשימה.</p>
+    <ul>
+      <li>הרשימה: <code>$steps[] = ["נתיב", ['type' =&gt; '...']];</code></li>
+      <li>הלולאה: <code>foreach ($steps as [$path, $params]) { ... }</code></li>
+      <li>דגל הצלחה: <code>$ok</code> שהופך ל-false בכישלון, ו-<code>break</code> שעוצר</li>
+    </ul>
+    <p>הסימן <code>[$path, $params]</code> בתוך ה-foreach "פותח" כל פריט לשני חלקים: הנתיב וההגדרות.</p>`,
+  code:String.raw`<?php
+$phone = "0501234567";
+$steps = [];
+
+$steps[] = ["/1/$phone", ['type' => 'record']];
+$steps[] = ["/2/$phone", ['type' => 'record']];
+$steps[] = ["/3/$phone", ['type' => 'menu']];
+
+$ok = true;
+foreach ($steps as [$path, $params]) {
+    echo "שולח: $path (type=" . $params['type'] . ")\n";
+    // כאן הייתה קריאה לשרת. אם נכשלת:
+    // $ok = false; break;
+}
+
+if ($ok) { print "הצלחה"; } else { print "כישלון"; }`,
+  quiz:[
+    {q:'מה היתרון בלשים את השלוחות ברשימה ובלולאה?', o:['הקוד רץ מהר יותר פי מאה','להוספת שלוחה מוסיפים שורה אחת לרשימה בלי קוד חדש','אין צורך בטוקן','השרת לא יודע על זה'], a:1, e:'הלוגיקה כתובה פעם אחת, והנתונים (הרשימה) הם מה שמשתנה.'},
+    {q:'מה זה  foreach ($steps as [$path, $params])  ?', o:['לולאה שפותחת כל פריט לשני משתנים','הגדרת פונקציה','תנאי','מחיקת מערך'], a:0, e:'כל פריט ברשימה הוא זוג, ו-[$path, $params] שולף את שני החלקים.'}
+  ],
+  ex:{
+    task:'צור רשימה $steps עם שלושה נתיבים (למשל "/1", "/2", "/3") והדפס כל אחד בלולאת foreach.',
+    starter:String.raw`<?php
+// כתוב כאן
+`,
+    checks:[
+      [/\$steps\s*=\s*\[[^\]]+,[^\]]+,[^\]]+\]\s*;/, 'צור: $steps = ["/1", "/2", "/3"];'],
+      [/foreach\s*\(\s*\$steps\s+as\s+\$\w+\s*\)/, 'כתוב: foreach ($steps as $p)'],
+      [/echo[^;]*\$\w+[^;]*;/, 'בתוך הלולאה הדפס את הנתיב הנוכחי']
+    ],
+    hint:'foreach ($steps as $p) { echo $p; }',
+    solution:String.raw`<?php
+$steps = ["/1", "/2", "/3"];
+foreach ($steps as $p) {
+    echo $p . "\n";
+}`
+  }
+}
+
+]; // סוף רשימת השיעורים
+
+
+/* =========================================================================
+   דף עזר מהיר - אפשר להוסיף שורות
+   ========================================================================= */
+const CHEAT = [
+  ['פתיחת קוד',            '<?php',                              'תחילת כל קובץ PHP'],
+  ['הדפסה',                'echo "טקסט";',                       'מדפיס החוצה'],
+  ['הערה',                 '// הערה',                            'לא רצה'],
+  ['משתנה',                '$name = "דוד";',                     'מתחיל ב-$'],
+  ['חיבור טקסט',           '"שלום " . $name',                    'נקודה מחברת'],
+  ['משתנה בתוך טקסט',      '"שלום $name"',                       'רק במרכאות כפולות'],
+  ['חישוב',                '$a + $b  $a * $b  $a % $b',         'חיבור, כפל, שארית'],
+  ['תנאי',                 'if ($a == 1) { } else { }',          'התאמה'],
+  ['וגם / או / לא',        '&&   ||   !',                        'שילוב תנאים'],
+  ['רשימה',                '$a = ["x", "y"];',                   'הראשון הוא $a[0]'],
+  ['מערך עם שמות',         "$a = ['type' => 'menu'];",           "קוראים $a['type']"],
+  ['הוספה למערך',          '$a[] = "z";',                        'מוסיף לסוף'],
+  ['כמות פריטים',          'count($a)',                          ''],
+  ['לולאת for',            'for ($i=0; $i<=9; $i++) { }',        'מספר ידוע של פעמים'],
+  ['לולאת foreach',        'foreach ($a as $x) { }',             'עובר על כל פריט'],
+  ['עצירת לולאה',          'break;',                             ''],
+  ['פונקציה',              'function f($x) { return $x; }',      'מגדירים פעם אחת'],
+  ['נתון מהכתובת',         "$_GET['token'] ?? ''",               'עם ערך ברירת מחדל'],
+  ['ניקוי ספרות',          "preg_replace('/\\D/', '', $x)",      'משאיר ספרות בלבד'],
+  ['קריאה לכתובת',         '$raw = file_get_contents($url);',    'false אם נכשל'],
+  ['JSON למערך',           'json_decode($raw, true)',            ''],
+  ['בניית כתובת',          'http_build_query($params)',          'מקודד אוטומטית'],
+  ['עצירה',                'exit();',                            'עוצר את הקובץ'],
+  ['בדיקת מערך',           'print_r($a);',                       'להדפסת תוכן'],
+  ['בדיקת סוג וערך',       'var_dump($x);',                      '']
+];
+
+
+/* =========================================================================
+   ממשק - מכאן והלאה זה הקוד שמריץ את האתר
+   ========================================================================= */
+const KEY = 'php_course_v1';
+let S = {done:{}, best:0};
+try { S = Object.assign(S, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isDone = (id,k) => !!(S.done[id] && S.done[id][k]);
+function mark(id,k){ (S.done[id] = S.done[id] || {})[k] = true; save(); updateProgress(); buildNav(); }
+
+function updateProgress(){
+  let n = 0;
+  LESSONS.forEach(L => { if(isDone(L.id,'quiz')) n++; if(isDone(L.id,'ex')) n++; });
+  const pct = Math.round(n / (LESSONS.length*2) * 100);
+  $('#progText').textContent = pct + '%';
+  $('#progBar').style.width = pct + '%';
+}
+
+function lessonComplete(L){ return isDone(L.id,'quiz') && isDone(L.id,'ex'); }
+
+function buildNav(){
+  const cur = location.hash || '#/';
+  let h = `<a href="#/" class="${cur==='#/'?'active':''}">🏠 דף הבית</a><hr>`;
+  LESSONS.forEach((L,i) => {
+    const href = '#/l/' + L.id;
+    h += `<a href="${href}" class="${cur===href?'active':''}"><span>${L.icon}</span><span>${i+1}. ${esc(L.title)}</span>${lessonComplete(L)?'<span class="tick">✓</span>':''}</a>`;
+  });
+  h += `<hr><a href="#/cheat" class="${cur==='#/cheat'?'active':''}">📋 דף עזר מהיר</a>`;
+  h += `<a href="#/exam" class="${cur==='#/exam'?'active':''}">🎯 מבחן מסכם</a>`;
+  $('#nav').innerHTML = h;
+}
+
+/* ---------- בלוק קוד עם כפתור העתקה ---------- */
+let codeStore = [];
+function codeBlock(code){
+  codeStore.push(code);
+  return `<div class="codewrap"><button class="copy" data-copy="${codeStore.length-1}">העתק</button><pre><code>${esc(code)}</code></pre></div>`;
+}
+
+/* ---------- דף הבית ---------- */
+function viewHome(){
+  let cards = '';
+  LESSONS.forEach((L,i) => {
+    const q = isDone(L.id,'quiz'), e = isDone(L.id,'ex');
+    cards += `<a class="lcard" href="#/l/${L.id}"><div class="ic">${L.icon}</div><b>${i+1}. ${esc(L.title)}</b><div class="st">בוחן ${q?'✓':'○'} · תרגיל ${e?'✓':'○'}</div></a>`;
+  });
+  const next = LESSONS.find(L => !lessonComplete(L));
+  return `
+    <h2>ברוך הבא לקורס PHP</h2>
+    <p>קורס קצר ומעשי שנבנה סביב מה שאתה באמת צריך: להבין ולערוך קוד כמו קובץ התא הקולי. בכל שיעור יש הסבר, דוגמה, בוחן קצר ותרגיל.</p>
+    ${next ? `<a class="btn" style="display:inline-block;text-decoration:none" href="#/l/${next.id}">המשך מהמקום שהפסקת: ${esc(next.title)}</a>` : `<div class="result ok">סיימת את כל השיעורים! נסה את המבחן המסכם.</div>`}
+    <div class="card"><h3>איך מריצים PHP אמיתי?</h3>
+      <p>הדפדפן לא מריץ PHP. כדי לראות קוד רץ באמת צריך שרת. הדרך הכי פשוטה במחשב: להתקין PHP (או חבילת XAMPP), ובתיקיית הקובץ להריץ בשורת הפקודה:</p>
+      ${codeBlock('php -S localhost:8000')}
+      <p>ואז לפתוח בדפדפן <code>http://localhost:8000/file.php?ApiPhone=0501234567</code>. התרגילים כאן נבדקים לפי מבנה הקוד, לא לפי הפלט.</p>
+    </div>
+    <h3>השיעורים</h3>
+    <div class="grid">${cards}</div>
+    <div class="card" style="margin-top:20px"><button class="btn secondary" id="resetBtn">איפוס ההתקדמות</button></div>`;
+}
+
+/* ---------- שיעור ---------- */
+function viewLesson(id){
+  const i = LESSONS.findIndex(L => L.id === id);
+  if(i < 0) return viewHome();
+  const L = LESSONS[i];
+
+  let quiz = '';
+  L.quiz.forEach((q,qi) => {
+    quiz += `<div class="q card" data-qi="${qi}"><p class="qt">${qi+1}. ${esc(q.q)}</p><div class="opts">` +
+      q.o.map((o,oi) => `<button class="opt" data-oi="${oi}">${esc(o)}</button>`).join('') +
+      `</div><div class="fb"></div></div>`;
+  });
+
+  return `
+    <span class="tag">שיעור ${i+1} מתוך ${LESSONS.length}</span>
+    <h2>${L.icon} ${esc(L.title)}</h2>
+    <div class="card">${L.html}</div>
+    <h3>דוגמה</h3>
+    ${codeBlock(L.code)}
+    <h3>בוחן קצר ${isDone(L.id,'quiz')?'✓':''}</h3>
+    <div id="quizBox" data-lid="${L.id}">${quiz}</div>
+    <h3>תרגיל ${isDone(L.id,'ex')?'✓':''}</h3>
+    <div class="card" id="exBox" data-lid="${L.id}">
+      <p><b>${esc(L.ex.task)}</b></p>
+      <textarea id="exCode" spellcheck="false">${esc(L.ex.starter)}</textarea>
+      <button class="btn" id="exCheck">בדוק</button>
+      <button class="btn secondary" id="exHint">רמז</button>
+      <button class="btn secondary" id="exSol">הצג פתרון</button>
+      <div id="exOut"></div>
+    </div>
+    <div class="nav-buttons">
+      ${i>0 ? `<a class="btn secondary" style="text-decoration:none" href="#/l/${LESSONS[i-1].id}">→ הקודם</a>` : '<span></span>'}
+      ${i<LESSONS.length-1 ? `<a class="btn" style="text-decoration:none" href="#/l/${LESSONS[i+1].id}">הבא ←</a>` : `<a class="btn" style="text-decoration:none" href="#/exam">למבחן המסכם ←</a>`}
+    </div>`;
+}
+
+/* ---------- דף עזר ---------- */
+function viewCheat(){
+  const rows = CHEAT.map(r => `<tr><td>${esc(r[0])}</td><td class="c">${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('');
+  return `<h2>📋 דף עזר מהיר</h2><div class="card"><table><tr><th>מה</th><th>קוד</th><th>הערה</th></tr>${rows}</table></div>`;
+}
+
+/* ---------- מבחן ---------- */
+let exam = null;
+function newExam(){
+  const all = [];
+  LESSONS.forEach(L => L.quiz.forEach(q => all.push(Object.assign({lesson:L.title}, q))));
+  for(let i = all.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [all[i],all[j]] = [all[j],all[i]]; }
+  exam = {qs: all.slice(0, Math.min(10, all.length)), ans: [], done:false};
+}
+function viewExam(){
+  if(!exam) newExam();
+  let h = `<h2>🎯 מבחן מסכם</h2><p>${exam.qs.length} שאלות אקראיות מכל הקורס. הציון הטוב ביותר שלך: <b>${S.best}%</b></p>`;
+  exam.qs.forEach((q,qi) => {
+    h += `<div class="card eq" data-qi="${qi}"><p class="qt">${qi+1}. ${esc(q.q)} <span class="tag">${esc(q.lesson)}</span></p><div class="opts">` +
+      q.o.map((o,oi) => {
+        let cls = 'opt';
+        if(exam.done){ if(oi===q.a) cls += ' ok'; else if(exam.ans[qi]===oi) cls += ' bad'; }
+        else if(exam.ans[qi]===oi) cls += ' sel';
+        return `<button class="${cls}" data-oi="${oi}">${esc(o)}</button>`;
+      }).join('') + `</div>${exam.done ? `<div class="fb ${exam.ans[qi]===q.a?'ok':'bad'}">${esc(q.e)}</div>` : ''}</div>`;
+  });
+  if(exam.done){
+    const ok = exam.qs.filter((q,i) => exam.ans[i]===q.a).length;
+    h += `<div class="result ${ok===exam.qs.length?'ok':'bad'}">ענית נכון על ${ok} מתוך ${exam.qs.length}.</div><button class="btn" id="examNew">מבחן חדש</button>`;
+  } else {
+    h += `<button class="btn" id="examFinish">סיים וחשב ציון</button>`;
+  }
+  return h;
+}
+
+/* ---------- ניתוב ---------- */
+function route(){
+  codeStore = [];
+  const h = location.hash || '#/';
+  let html;
+  if(h.startsWith('#/l/'))      html = viewLesson(h.slice(4));
+  else if(h === '#/cheat')      html = viewCheat();
+  else if(h === '#/exam')       html = viewExam();
+  else                          html = viewHome();
+  $('#main').innerHTML = html;
+  buildNav();
+  window.scrollTo(0,0);
+  closeMenu();
+}
+
+/* ---------- תפריט במסך קטן ---------- */
+function closeMenu(){ $('#nav').classList.remove('open'); $('#scrim').classList.remove('show'); }
+$('#menuBtn').onclick = () => { $('#nav').classList.toggle('open'); $('#scrim').classList.toggle('show'); };
+$('#scrim').onclick = closeMenu;
+
+/* ---------- אירועים ---------- */
+function stripComments(code){
+  return code.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/.*$/gm, '$1');
+}
+
+document.addEventListener('click', ev => {
+  const t = ev.target;
+
+  // העתקת קוד
+  if(t.dataset && t.dataset.copy !== undefined){
+    const code = codeStore[+t.dataset.copy];
+    const done = () => { t.textContent = 'הועתק ✓'; setTimeout(() => t.textContent = 'העתק', 1400); };
+    try { navigator.clipboard.writeText(code).then(done, () => { fallbackCopy(code); done(); }); }
+    catch(e){ fallbackCopy(code); done(); }
+    return;
+  }
+
+  // בוחן בשיעור
+  if(t.classList.contains('opt') && t.closest('#quizBox')){
+    const box = t.closest('#quizBox');
+    const L = LESSONS.find(x => x.id === box.dataset.lid);
+    const qEl = t.closest('.q');
+    if(qEl.classList.contains('solved')) return;
+    const q = L.quiz[+qEl.dataset.qi];
+    const fb = qEl.querySelector('.fb');
+    if(+t.dataset.oi === q.a){
+      t.classList.add('ok');
+      qEl.classList.add('solved');
+      fb.className = 'fb ok';
+      fb.textContent = 'נכון! ' + q.e;
+      if(!box.querySelector('.q:not(.solved)')) mark(L.id,'quiz');
+    } else {
+      t.classList.add('bad');
+      t.disabled = true;
+      fb.className = 'fb bad';
+      fb.textContent = 'לא נכון, נסה שוב.';
+    }
+    return;
+  }
+
+  // תרגיל
+  if(t.id === 'exCheck' || t.id === 'exHint' || t.id === 'exSol'){
+    const box = $('#exBox');
+    const L = LESSONS.find(x => x.id === box.dataset.lid);
+    const out = $('#exOut');
+    if(t.id === 'exHint'){ out.innerHTML = `<div class="hint">💡 ${esc(L.ex.hint)}</div>`; return; }
+    if(t.id === 'exSol'){ out.innerHTML = `<div class="hint"><b>פתרון לדוגמה:</b></div>` + codeBlock(L.ex.solution); return; }
+    const code = stripComments($('#exCode').value);
+    const missing = L.ex.checks.filter(c => !c[0].test(code)).map(c => c[1]);
+    if(missing.length === 0){
+      out.innerHTML = `<div class="result ok">✓ מצוין! התרגיל הושלם.</div>`;
+      mark(L.id,'ex');
+    } else {
+      out.innerHTML = `<div class="result bad">עוד לא לגמרי:<ul>${missing.map(m => `<li>${esc(m)}</li>`).join('')}</ul></div>`;
+    }
+    return;
+  }
+
+  // מבחן
+  if(t.classList.contains('opt') && t.closest('.eq')){
+    if(exam.done) return;
+    const qi = +t.closest('.eq').dataset.qi;
+    exam.ans[qi] = +t.dataset.oi;
+    t.closest('.opts').querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
+    t.classList.add('sel');
+    return;
+  }
+  if(t.id === 'examFinish'){
+    const unanswered = exam.qs.filter((q,i) => exam.ans[i] === undefined).length;
+    if(unanswered && !confirm('נשארו ' + unanswered + ' שאלות ללא תשובה. לסיים בכל זאת?')) return;
+    exam.done = true;
+    const ok = exam.qs.filter((q,i) => exam.ans[i]===q.a).length;
+    const pct = Math.round(ok / exam.qs.length * 100);
+    if(pct > S.best){ S.best = pct; save(); }
+    $('#main').innerHTML = viewExam();
+    window.scrollTo(0,0);
+    return;
+  }
+  if(t.id === 'examNew'){ newExam(); $('#main').innerHTML = viewExam(); window.scrollTo(0,0); return; }
+
+  // איפוס
+  if(t.id === 'resetBtn'){
+    if(confirm('למחוק את כל ההתקדמות?')){ S = {done:{}, best:0}; save(); updateProgress(); route(); }
+  }
+});
+
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+}
+
+// מקש Tab בתיבת הקוד מוסיף 4 רווחים (במקום לקפוץ לשדה הבא)
+document.addEventListener('keydown', ev => {
+  if(ev.target.id === 'exCode' && ev.key === 'Tab'){
+    ev.preventDefault();
+    const ta = ev.target, s = ta.selectionStart;
+    ta.value = ta.value.slice(0,s) + '    ' + ta.value.slice(ta.selectionEnd);
+    ta.selectionStart = ta.selectionEnd = s + 4;
+  }
+});
+
+window.addEventListener('hashchange', route);
+updateProgress();
+route();
+</script>
+</body>
+</html>
