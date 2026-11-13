@@ -43,7 +43,7 @@ class MainActivity : Activity() {
             try {
                 val safeName = requestedName
                     .substringAfterLast('/')
-                    .substringAfterLast('\\\\')
+                    .substringAfterLast('\\')
                     .replace(Regex("[^A-Za-z0-9._-]"), "_")
                     .ifBlank { "php-code.php" }
                 val bytes = content.toByteArray(StandardCharsets.UTF_8)
